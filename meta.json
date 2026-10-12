@@ -1,0 +1,17 @@
+{
+  "category": "General",
+  "changelog": "",
+  "description": "Watch movies and shows with friends in sync, like the Xbox 360 watch parties. Everyone's avatar sits in a virtual theater in front of the screen. Send reactions, chat, and talk over voice chat while you watch. The host controls playback and guests follow along. Works in the Jellyfin web client; any app that can be remote controlled follows the playback.",
+  "guid": "f8632b44-5a33-421a-8021-0d66d6c2c7ef",
+  "name": "Watch Party",
+  "overview": "Watch together in a virtual theater with your friends' avatars",
+  "owner": "ablatnick",
+  "imageUrl": "https://raw.githubusercontent.com/ablatnick/jellyfin-plugin-watchparty/main/images/thumb.png",
+  "targetAbi": "12.0.0.0",
+  "timestamp": "2026-10-11T00:00:00.0000000Z",
+  "version": "1.0.0.0",
+  "status": "Active",
+  "autoUpdate": false,
+  "imagePath": "",
+  "assemblies": ["Jellyfin.Plugin.WatchParty.dll"]
+}

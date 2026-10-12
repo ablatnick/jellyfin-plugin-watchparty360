@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Watch Party</title>
+</head>
+<body>
+    <div id="WatchPartyConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
+        <div data-role="content">
+            <div class="content-primary">
+                <h2>Watch Party</h2>
+                <p>Watch together in sync, with avatars in a virtual theater, reactions, chat and voice. Start a party from the 👥 button on any movie or episode in the web client.</p>
+                <form id="WatchPartyConfigForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="wpMaxMembers">Seats per party</label>
+                        <input id="wpMaxMembers" name="MaxMembers" type="number" is="emby-input" min="2" max="8" step="1" />
+                        <div class="fieldDescription">How many people fit in a party, host included (2–8). The theater has 8 seats.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="wpDrift">Sync tolerance (seconds)</label>
+                        <input id="wpDrift" name="DriftToleranceSeconds" type="number" is="emby-input" min="1" max="30" step="0.5" />
+                        <div class="fieldDescription">How far a guest may drift from the host before they're moved back in step. Raise this if guests on slow connections keep re-buffering.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="wpIce">Voice chat servers (STUN/TURN)</label>
+                        <input id="wpIce" name="IceServers" type="text" is="emby-input" />
+                        <div class="fieldDescription">
+                            Comma-separated. Browsers use these to find each other for voice chat; the audio itself goes directly between them.
+                            Add a TURN relay if some people can't hear each other, e.g. <code>stun:stun.l.google.com:19302, turn:user:password@turn.example.com:3478</code>.
+                            Leave empty to only connect people on the same network. Voice chat needs Jellyfin to be opened over https.
+                        </div>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function () {
+                var pluginId = 'f8632b44-5a33-421a-8021-0d66d6c2c7ef';
+                var page = document.querySelector('#WatchPartyConfigPage');
+                var form = document.querySelector('#WatchPartyConfigForm');
+
+                page.addEventListener('pageshow', function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        form.querySelector('#wpMaxMembers').value = config.MaxMembers;
+                        form.querySelector('#wpDrift').value = config.DriftToleranceSeconds;
+                        form.querySelector('#wpIce').value = config.IceServers || '';
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        config.MaxMembers = Math.min(8, Math.max(2, parseInt(form.querySelector('#wpMaxMembers').value, 10) || 8));
+                        config.DriftToleranceSeconds = Math.min(30, Math.max(1, parseFloat(form.querySelector('#wpDrift').value) || 3));
+                        config.IceServers = form.querySelector('#wpIce').value.trim();
+                        return ApiClient.updatePluginConfiguration(pluginId, config);
+                    }).then(Dashboard.processPluginConfigurationUpdateResult);
+                    return false;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

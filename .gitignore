@@ -1,0 +1,6 @@
+bin/
+obj/
+dist/
+out/
+pkg/
+*.zip

@@ -1,0 +1,74 @@
+name: Release
+
+# Push a tag like v1.2.0 to build the plugin, attach it to a GitHub release,
+# and add it to manifest.json so Jellyfin servers see the update.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Work out the version
+        id: v
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          IFS=. read -r a b c d <<< "$tag"
+          version="${a:-0}.${b:-0}.${c:-0}.${d:-0}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "zip=watchparty_${version}.zip" >> "$GITHUB_OUTPUT"
+          # The tag's message becomes the changelog (git tag -a v1.2.0 -m "What changed").
+          notes="$(git tag -l --format='%(contents)' "$GITHUB_REF_NAME" | sed '/-----BEGIN PGP/,$d')"
+          [ -n "$notes" ] || notes="See https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+          { echo "notes<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: |
+          dotnet publish Jellyfin.Plugin.WatchParty -c Release -o out \
+            -p:Version=${{ steps.v.outputs.version }} \
+            -p:AssemblyVersion=${{ steps.v.outputs.version }} \
+            -p:FileVersion=${{ steps.v.outputs.version }}
+
+      - name: Package
+        env:
+          NOTES: ${{ steps.v.outputs.notes }}
+        run: |
+          mkdir pkg
+          cp out/Jellyfin.Plugin.WatchParty.dll pkg/
+          python3 scripts/release.py meta \
+            --version "${{ steps.v.outputs.version }}" --changelog "$NOTES" --out pkg/meta.json
+          (cd pkg && zip -q "../${{ steps.v.outputs.zip }}" *)
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ steps.v.outputs.notes }}
+        run: gh release create "$GITHUB_REF_NAME" "${{ steps.v.outputs.zip }}" --title "Watch Party $GITHUB_REF_NAME" --notes "$NOTES"
+
+      - name: Add it to the plugin repository
+        env:
+          NOTES: ${{ steps.v.outputs.notes }}
+        run: |
+          git fetch origin main
+          git checkout main
+          python3 scripts/release.py manifest \
+            --version "${{ steps.v.outputs.version }}" --changelog "$NOTES" \
+            --zip "${{ steps.v.outputs.zip }}" \
+            --url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${{ steps.v.outputs.zip }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "Add ${GITHUB_REF_NAME} to the plugin repository"
+          git push origin main
