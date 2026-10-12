@@ -24,6 +24,8 @@ jobs:
       - name: Work out the version
         id: v
         run: |
+          # actions/checkout turns annotated tags into lightweight ones; fetch the real tag for its message.
+          git fetch --force --tags origin
           tag="${GITHUB_REF_NAME#v}"
           IFS=. read -r a b c d <<< "$tag"
           version="${a:-0}.${b:-0}.${c:-0}.${d:-0}"
