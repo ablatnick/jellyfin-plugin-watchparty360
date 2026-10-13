@@ -6,7 +6,7 @@
   "name": "Watch Party",
   "overview": "Watch together in a virtual theater with your friends' avatars",
   "owner": "ablatnick",
-  "imageUrl": "https://raw.githubusercontent.com/ablatnick/jellyfin-plugin-watchparty/main/images/thumb.png",
+  "imageUrl": "https://raw.githubusercontent.com/ablatnick/jellyfin-plugin-watchparty360/main/images/thumb.png",
   "targetAbi": "12.0.0.0",
   "timestamp": "2026-10-11T00:00:00.0000000Z",
   "version": "1.0.0.0",

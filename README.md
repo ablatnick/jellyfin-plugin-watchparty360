@@ -33,14 +33,14 @@ Requires **Jellyfin 12.x**.
 
 1. In Jellyfin, open **Dashboard → Plugins → Repositories (Catalog settings)** and add:
 
-       https://raw.githubusercontent.com/ablatnick/jellyfin-plugin-watchparty/main/manifest.json
+       https://raw.githubusercontent.com/ablatnick/jellyfin-plugin-watchparty360/main/manifest.json
 
 2. Open the **Catalog**, find **Watch Party** under *General*, and install it.
 3. Restart Jellyfin, then refresh any open browser tabs.
 
 ### Manual install
 
-Download the zip from [Releases](https://github.com/ablatnick/jellyfin-plugin-watchparty/releases). Extract it into `<jellyfin config>/plugins/WatchParty/` and restart Jellyfin.
+Download the zip from [Releases](https://github.com/ablatnick/jellyfin-plugin-watchparty360/releases). Extract it into `<jellyfin config>/plugins/WatchParty/` and restart Jellyfin.
 
 ## How to use
 
