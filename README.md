@@ -4,6 +4,8 @@
 
 Watch movies and shows with friends in sync, like the Xbox 360 watch parties. Everyone's avatar sits in a virtual theater in front of the screen. React, chat and talk while you watch. The host has the remote and everyone else follows along.
 
+> **Requires Jellyfin 12.1 or newer.** It's built against Jellyfin 12.1, so servers on 10.11 or older can't install it. The theater, reactions, chat and voice need the Jellyfin web client.
+
 ## Features
 
 - **Synced playback.** Start a party from the 👥 button on any movie or episode. Invite friends, and they get a pop-up invite in the web client. The host's play, pause, seek and next episode are mirrored for everyone. A guest who drifts out of step is caught up automatically.
@@ -29,7 +31,7 @@ Watch movies and shows with friends in sync, like the Xbox 360 watch parties. Ev
 
 ## Install
 
-Requires **Jellyfin 12.x**.
+Requires **Jellyfin 12.1 or newer** (10.11 and older can't install it).
 
 1. In Jellyfin, open **Dashboard → Plugins → Repositories (Catalog settings)** and add:
 
@@ -62,8 +64,14 @@ Download the zip from [Releases](https://github.com/ablatnick/jellyfin-plugin-wa
 ## Voice chat notes
 
 - **HTTPS is required.** Browsers only allow the microphone on https pages (or localhost). Over plain `http://<ip>:8096`, the voice button explains this instead of working.
-- **Audio is peer to peer.** It goes directly between browsers (WebRTC). The server only passes the connection setup messages along, and nothing is recorded.
-- **STUN and TURN servers.** By default, browsers use Google's public STUN server to find each other. A STUN server only helps two computers find a way to connect; no audio passes through it. People behind strict NATs may not hear each other. A TURN relay (e.g. [coturn](https://github.com/coturn/coturn)) fixes that: add it as `turn:user:password@host:3478`. Leave the setting empty to only connect people on the same network.
+- **Audio is peer to peer and encrypted.** By default it goes directly between browsers over WebRTC, which always encrypts it. Watch Party records nothing and stores no audio.
+- **What other servers see.** Voice chat sets up connections through a few servers, and they see connection details but not your audio:
+  - **Your Jellyfin server** passes the connection setup messages between browsers, so it sees each person's IP addresses. Watch Party doesn't log them.
+  - **The STUN server** (by default Google's public `stun.l.google.com`) tells each browser its public IP address, so Google sees that IP address and when you connect.
+  - **A TURN relay**, if you add one, carries the encrypted audio for people who can't connect directly. Its operator sees IP addresses and how much data flows, but can't decrypt the audio.
+
+  To keep all of this in your own hands, run your own STUN/TURN server (e.g. [coturn](https://github.com/coturn/coturn)) and list only it, or leave the setting empty to only connect people on the same network.
+- **STUN and TURN settings.** People behind strict NATs may not hear each other with STUN alone. A TURN relay fixes that: add it as `turn:user:password@host:3478`.
 - **Headphones help.** They stop the movie audio from leaking into your mic.
 
 ## How it works
@@ -93,6 +101,10 @@ The workflow then:
 - builds the plugin
 - attaches `watchparty_1.0.0.0.zip` to a GitHub release
 - adds the version to `manifest.json`, so Jellyfin servers that use the repository see the update
+
+## Support
+
+If Watch Party is useful to you, you can support it and other projects on [Venmo (@ablatnick)](https://venmo.com/u/ablatnick).
 
 ## License
 
