@@ -6,6 +6,8 @@ Watch movies and shows with friends in sync, like the Xbox 360 watch parties. Ev
 
 > **Requires Jellyfin 12.1 or newer.** It's built against Jellyfin 12.1, so servers on 10.11 or older can't install it. The theater, reactions, chat and voice need the Jellyfin web client.
 
+> ❤️ Enjoying Watch Party? You can [support it on Venmo (@ablatnick)](https://venmo.com/u/ablatnick).
+
 ## Features
 
 - **Synced playback.** Start a party from the 👥 button on any movie or episode. Invite friends, and they get a pop-up invite in the web client. The host's play, pause, seek and next episode are mirrored for everyone. A guest who drifts out of step is caught up automatically.
